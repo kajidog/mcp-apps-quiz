@@ -1,0 +1,39 @@
+{
+  "name": "@quiz/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./mcp-app.html": "./dist/mcp-app.html"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && cross-env INPUT=mcp-app.html vite build",
+    "watch": "cross-env INPUT=mcp-app.html vite build --watch",
+    "typecheck": "tsc --noEmit",
+    "codegen": "graphql-codegen --config codegen.ts"
+  },
+  "dependencies": {
+    "@graphql-typed-document-node/core": "^3.2.0",
+    "@modelcontextprotocol/ext-apps": "^1.7.2",
+    "@quiz/core": "workspace:*",
+    "graphql": "^16.10.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.3",
+    "@graphql-codegen/client-preset": "^4.5.1",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.9.3",
+    "vite": "^6.0.7",
+    "vite-plugin-singlefile": "^2.1.0"
+  }
+}

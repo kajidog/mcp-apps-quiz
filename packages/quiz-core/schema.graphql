@@ -1,0 +1,139 @@
+"""
+クイズの共有 GraphQL スキーマ（真実の源）。
+サーバ（リゾルバ）とブラウザ UI（型付きクライアント）の双方がこの 1 ファイルを参照する。
+"""
+type Choice {
+  id: ID!
+  order: Int!
+  text: String!
+  isCorrect: Boolean!
+}
+
+type Question {
+  id: ID!
+  order: Int!
+  text: String!
+  explanation: String
+  choices: [Choice!]!
+}
+
+type Quiz {
+  id: ID!
+  title: String!
+  tags: [String!]!
+  favorite: Boolean!
+  questions: [Question!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type QuizSummary {
+  id: ID!
+  title: String!
+  tags: [String!]!
+  favorite: Boolean!
+  questionCount: Int!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type QuestionResult {
+  questionId: ID!
+  selectedChoiceIds: [ID!]!
+  correctChoiceIds: [ID!]!
+  isCorrect: Boolean!
+}
+
+type Attempt {
+  id: ID!
+  quizId: ID!
+  quizTitle: String!
+  score: Int!
+  total: Int!
+  results: [QuestionResult!]!
+  startedAt: String!
+  finishedAt: String!
+}
+
+type AttemptSummary {
+  id: ID!
+  quizId: ID!
+  quizTitle: String!
+  score: Int!
+  total: Int!
+  finishedAt: String!
+}
+
+"""
+履歴詳細の 1 設問分（出題内容 + 自分の解答 + 正誤）。question は編集等で削除済みなら null。
+"""
+type AttemptAnswerDetail {
+  questionId: ID!
+  question: Question
+  selectedChoiceIds: [ID!]!
+  correctChoiceIds: [ID!]!
+  isCorrect: Boolean!
+}
+
+"""
+受験 1 回分の採点済み詳細（履歴から内容を見るための表示用）。
+"""
+type AttemptDetail {
+  id: ID!
+  title: String!
+  score: Int!
+  total: Int!
+  startedAt: String!
+  finishedAt: String!
+  answers: [AttemptAnswerDetail!]!
+}
+
+input ChoiceInput {
+  text: String!
+  isCorrect: Boolean!
+}
+
+input QuestionInput {
+  text: String!
+  explanation: String
+  choices: [ChoiceInput!]!
+}
+
+input CreateQuizInput {
+  title: String!
+  tags: [String!]
+  questions: [QuestionInput!]!
+}
+
+input EditQuizPatch {
+  title: String
+  tags: [String!]
+  favorite: Boolean
+  questions: [QuestionInput!]
+}
+
+input AnswerInput {
+  questionId: ID!
+  choiceIds: [ID!]!
+}
+
+type Query {
+  quiz(id: ID!): Quiz
+  searchQuizzes(query: String, tags: [String!], favoriteOnly: Boolean, limit: Int): [QuizSummary!]!
+  recentAttempts(limit: Int): [AttemptSummary!]!
+  attempt(id: ID!): AttemptDetail
+}
+
+type Mutation {
+  createQuiz(input: CreateQuizInput!): Quiz!
+  editQuiz(quizId: ID!, patch: EditQuizPatch!): Quiz
+  toggleFavorite(quizId: ID!): Quiz
+  submitAttempt(quizId: ID!, answers: [AnswerInput!]!, startedAt: String): Attempt!
+  submitSession(
+    quizIds: [ID!]!
+    answers: [AnswerInput!]!
+    startedAt: String
+    title: String
+  ): Attempt!
+  presentQuiz(quizId: ID, tags: [String!]): Quiz
+}
