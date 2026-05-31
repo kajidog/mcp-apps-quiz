@@ -12,6 +12,8 @@
     "watch": "cross-env INPUT=mcp-app.html vite build --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:ci": "vitest run --reporter=default --reporter=junit --outputFile.junit=./reports/junit.xml --coverage",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "codegen": "graphql-codegen --config codegen.ts"
   },
