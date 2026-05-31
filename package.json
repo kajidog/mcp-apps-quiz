@@ -6,7 +6,7 @@
   "packageManager": "pnpm@10.29.3",
   "scripts": {
     "build": "pnpm -r build",
-    "ci": "pnpm run lint && pnpm run typecheck && pnpm run test:coverage",
+    "ci": "pnpm run codegen && pnpm run lint && pnpm run typecheck && pnpm run test:coverage",
     "dev": "pnpm -F @quiz/server dev",
     "test": "pnpm -r test",
     "test:ci": "pnpm --filter @quiz/core --filter @quiz/ui test:ci",
@@ -16,7 +16,7 @@
     "typecheck": "pnpm -r typecheck",
     "coverage:summary": "node scripts/coverage-summary.mjs",
     "format": "biome format --write .",
-    "codegen": "pnpm -F @quiz/server codegen"
+    "codegen": "pnpm -F @quiz/server codegen && pnpm -F @quiz/ui codegen"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
