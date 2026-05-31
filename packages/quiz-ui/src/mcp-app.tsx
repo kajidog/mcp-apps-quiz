@@ -1,13 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { App } from "./App.js";
-import { QuizClientProvider } from "./client/provider.js";
+import { App } from "./app/App.js";
+import { AppProviders } from "./app/providers.js";
 import "./global.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QuizClientProvider>
+    <AppProviders>
       <App />
-    </QuizClientProvider>
+    </AppProviders>
   </StrictMode>,
 );
