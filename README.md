@@ -4,31 +4,6 @@ AI が生成したクイズを対話型 UI で表示し、後から再受験・�
 **MCP Apps** サーバー。同じ UI を **MCP ホスト（Claude Desktop 等）** と **ブラウザ単体** の
 両方で動かせる（データアクセスを抽象化し、MCP 経路は `callServerTool`、ブラウザ経路は GraphQL）。
 
-## 構成（pnpm モノレポ）
-
-```
-packages/
-  quiz-core/   ドメイン型・Drizzle(SQLite)・Repository・サービス・採点ロジック（唯一の真実）
-  quiz-ui/     React + Vite + Tailwind の UI。単一HTMLバンドル(dist/mcp-app.html)を出力
-apps/
-  server/      単一 Hono アプリ。/mcp・/graphql・ブラウザUI(/) を同居配信
-```
-
-- **抽象化の核**: `packages/quiz-ui/src/client/` の `QuizClient` インターフェースに対し、
-  `McpQuizClient`（`app.callServerTool`）と `GraphQLQuizClient`（`/graphql`）の 2 実装。
-  `provider.tsx` が iframe 埋め込み(=MCP)かトップウィンドウ(=ブラウザ)かで自動選択する。
-- MCP・GraphQL の両経路とも `quiz-core` の `QuizService` だけを呼ぶ。
-- **共有 GraphQL スキーマ**: SDL は `packages/quiz-core/schema.graphql`（真実の源）に置き、
-  サーバのリゾルバ（`makeExecutableSchema`）とブラウザ UI の codegen の両方がここを参照する。
-  codegen の `schema` は相対パスではなく `require.resolve("@quiz/core/schema.graphql")` で解決する。
-  UI 側は graphql-codegen の **client-preset** で型付き TypedDocumentNode を `packages/quiz-ui/src/gql/` に生成する。
-
-## データモデル
-
-タグ・タイトル・問題文・選択肢（正解フラグ付き）・解説・お気に入り、および受験履歴。
-SQLite に正規化して永続化（`quizzes` / `tags` / `quiz_tags` / `questions` / `choices` /
-`attempts` / `attempt_answers`）。
-
 ## MCP ツール
 
 | ツール | 種別 | 用途 |
