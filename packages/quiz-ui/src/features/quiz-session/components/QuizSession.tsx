@@ -2,6 +2,7 @@ import { useQuizSearch } from "@/features/quiz-library";
 import { cn } from "@/shared/lib/utils.js";
 import { Badge, Button, Card, CardContent } from "@/shared/ui/index.js";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { collectTags, filterQuizzes, totalQuestions } from "../lib/filter.js";
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
  * 件数を確認してから「まとめ受験」を開始する。
  */
 export function QuizSession({ onStart }: Props) {
+  const { t } = useTranslation(["session", "common"]);
   const { data: all = [], isLoading } = useQuizSearch("");
 
   const [minQuestions, setMinQuestions] = useState(0);
@@ -50,17 +52,19 @@ export function QuizSession({ onStart }: Props) {
     setSelected(new Set());
   }
 
-  if (isLoading) return <p className="p-4 text-sm text-slate-500">読み込み中…</p>;
+  if (isLoading) return <p className="p-4 text-sm text-slate-500">{t("common:loading")}</p>;
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
-      <h1 className="text-xl font-bold">受験するクイズを選ぶ</h1>
+      <h1 className="text-xl font-bold">{t("select.title")}</h1>
 
       {/* --- 絞り込み条件 --- */}
       <Card>
         <CardContent className="flex flex-col gap-3 pt-5">
           <label className="flex items-center justify-between gap-2 text-sm">
-            <span className="font-medium text-slate-700">問題数（{minQuestions} 問以上）</span>
+            <span className="font-medium text-slate-700">
+              {t("select.minQuestions", { count: minQuestions })}
+            </span>
             <input
               type="range"
               min={0}
@@ -78,12 +82,12 @@ export function QuizSession({ onStart }: Props) {
               onChange={(e) => setFavoriteOnly(e.target.checked)}
               className="h-4 w-4"
             />
-            <span className="font-medium text-slate-700">お気に入りのみ</span>
+            <span className="font-medium text-slate-700">{t("select.favoriteOnly")}</span>
           </label>
 
           {allTags.length > 0 && (
             <div className="flex flex-col gap-1">
-              <span className="text-sm font-medium text-slate-700">タグ</span>
+              <span className="text-sm font-medium text-slate-700">{t("select.tags")}</span>
               <div className="flex flex-wrap gap-1">
                 {allTags.map((tag) => (
                   <button
@@ -109,22 +113,25 @@ export function QuizSession({ onStart }: Props) {
       {/* --- 件数サマリ + 操作 --- */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-sm text-slate-600">
-          条件に一致 <strong>{filtered.length}</strong> 件 / 選択中 <strong>{target.length}</strong>{" "}
-          件・<strong>{targetQuestionTotal}</strong> 問
+          {t("select.summary", {
+            filtered: filtered.length,
+            selected: target.length,
+            questions: targetQuestionTotal,
+          })}
         </span>
         <div className="flex gap-2">
           <Button variant="ghost" onClick={selectAllFiltered}>
-            一致を全選択
+            {t("select.selectAll")}
           </Button>
           <Button variant="ghost" onClick={clearSelection}>
-            選択解除
+            {t("select.clearSelection")}
           </Button>
         </div>
       </div>
 
       {/* --- 個別選択リスト --- */}
       {filtered.length === 0 && (
-        <p className="text-sm text-slate-500">条件に一致するクイズがありません。</p>
+        <p className="text-sm text-slate-500">{t("select.empty")}</p>
       )}
       {filtered.map((q) => {
         const checked = selected.has(q.id);
@@ -143,7 +150,7 @@ export function QuizSession({ onStart }: Props) {
                 checked={checked}
                 onChange={() => toggleSelect(q.id)}
                 onClick={(e) => e.stopPropagation()}
-                aria-label="このクイズを選択"
+                aria-label={t("select.selectQuizAria")}
                 className="h-4 w-4"
               />
               <div className="flex flex-1 flex-col">
@@ -157,7 +164,9 @@ export function QuizSession({ onStart }: Props) {
                   ))}
                 </div>
               </div>
-              <span className="text-xs text-slate-500">{q.questionCount} 問</span>
+              <span className="text-xs text-slate-500">
+                {t("select.questionCount", { count: q.questionCount })}
+              </span>
             </CardContent>
           </Card>
         );
@@ -168,7 +177,7 @@ export function QuizSession({ onStart }: Props) {
         disabled={target.length === 0}
         className="sticky bottom-4 self-end shadow-lg"
       >
-        受験を始める（{targetQuestionTotal} 問）
+        {t("select.start", { count: targetQuestionTotal })}
       </Button>
     </div>
   );

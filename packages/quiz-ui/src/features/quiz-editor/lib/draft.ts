@@ -45,21 +45,39 @@ export function buildQuestions(drafts: QuestionDraft[]): CreateQuizInput["questi
   }));
 }
 
+export interface ValidationMessages {
+  titleRequired: () => string;
+  questionsRequired: () => string;
+  questionTextRequired: (number: number) => string;
+  choicesRequired: (number: number) => string;
+  correctChoiceRequired: (number: number) => string;
+}
+
+const jaValidationMessages: ValidationMessages = {
+  titleRequired: () => "タイトルを入力してください。",
+  questionsRequired: () => "設問は 1 つ以上必要です。",
+  questionTextRequired: (number) => `Q${number}: 問題文を入力してください。`,
+  choicesRequired: (number) => `Q${number}: 選択肢は 2 つ以上必要です。`,
+  correctChoiceRequired: (number) => `Q${number}: 正解の選択肢を 1 つ以上選んでください。`,
+};
+
 /**
  * 整形済みの内容を事前検証する（サーバ側 zod でも検証されるが、分かりやすいメッセージのため）。
- * 問題なければ null、あれば日本語のエラーメッセージを返す。
+ * 問題なければ null、あれば UI 表示用のエラーメッセージを返す。
  */
 export function validateBuiltQuiz(
   title: string,
   questions: CreateQuizInput["questions"],
+  messages: ValidationMessages = jaValidationMessages,
 ): string | null {
-  if (!title.trim()) return "タイトルを入力してください。";
-  if (questions.length === 0) return "設問は 1 つ以上必要です。";
+  if (!title.trim()) return messages.titleRequired();
+  if (questions.length === 0) return messages.questionsRequired();
   for (const [i, q] of questions.entries()) {
-    if (!q.text) return `Q${i + 1}: 問題文を入力してください。`;
-    if (q.choices.length < 2) return `Q${i + 1}: 選択肢は 2 つ以上必要です。`;
+    const number = i + 1;
+    if (!q.text) return messages.questionTextRequired(number);
+    if (q.choices.length < 2) return messages.choicesRequired(number);
     if (!q.choices.some((c) => c.isCorrect)) {
-      return `Q${i + 1}: 正解の選択肢を 1 つ以上選んでください。`;
+      return messages.correctChoiceRequired(number);
     }
   }
   return null;

@@ -6,7 +6,9 @@ import { QuizRunner } from "@/features/quiz-session";
 import { QuizSession } from "@/features/quiz-session";
 import { SessionRunner } from "@/features/quiz-session";
 import { useInitialPayload, useTransport } from "@/shared/api";
+import { LanguageSwitcher } from "@/shared/i18n/LanguageSwitcher.js";
 import { Button } from "@/shared/ui/index.js";
+import { useTranslation } from "react-i18next";
 import { type View, useNavigation } from "./useNavigation.js";
 
 /**
@@ -16,15 +18,16 @@ export function App() {
   const { transport } = useTransport();
   const initialPayload = useInitialPayload();
   const nav = useNavigation();
+  const { t } = useTranslation("common");
 
   if (transport === "connecting") {
-    return <p className="p-6 text-sm text-slate-500">接続中…</p>;
+    return <p className="p-6 text-sm text-slate-500">{t("connecting")}</p>;
   }
 
   const navItems: { key: View; label: string }[] = [
-    { key: "list", label: "一覧" },
-    { key: "session", label: "受験" },
-    { key: "history", label: "履歴" },
+    { key: "list", label: t("nav.list") },
+    { key: "session", label: t("nav.session") },
+    { key: "history", label: t("nav.history") },
   ];
 
   return (
@@ -41,9 +44,12 @@ export function App() {
           </Button>
         ))}
         <Button variant={nav.view === "edit" ? "secondary" : "ghost"} onClick={nav.startCreate}>
-          新規作成
+          {t("nav.create")}
         </Button>
-        <span className="ml-auto text-xs text-slate-400">{transport}</span>
+        <div className="ml-auto flex items-center gap-2">
+          <LanguageSwitcher />
+          <span className="text-xs text-slate-400">{transport}</span>
+        </div>
       </nav>
 
       {nav.view === "list" && (

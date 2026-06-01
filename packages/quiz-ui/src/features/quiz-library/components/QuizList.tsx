@@ -1,6 +1,7 @@
 import { Button } from "@/shared/ui/index.js";
 import type { Quiz, QuizSummary } from "@quiz/core";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuizSearch } from "../hooks/useQuizSearch.js";
 import { QuizListCard } from "./QuizListCard.js";
 
@@ -15,6 +16,7 @@ interface Props {
  * 選択肢をクリックして解説を見たり、編集を開いたりできる。受験はしない。
  */
 export function QuizList({ initial, onEdit }: Props) {
+  const { t } = useTranslation(["library", "common"]);
   // 入力中のクエリ（draft）と、実際に検索を投げたクエリ（submitted）を分ける。
   const [draft, setDraft] = useState("");
   const [submitted, setSubmitted] = useState("");
@@ -36,18 +38,14 @@ export function QuizList({ initial, onEdit }: Props) {
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="タイトル・問題文・タグで検索"
+          placeholder={t("search.placeholder")}
           className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm"
         />
-        <Button type="submit">検索</Button>
+        <Button type="submit">{t("search.submit")}</Button>
       </form>
 
-      {isLoading && <p className="text-sm text-slate-500">読み込み中…</p>}
-      {!isLoading && quizzes.length === 0 && (
-        <p className="text-sm text-slate-500">
-          クイズがありません。AI に作成を頼むか、新規作成しましょう。
-        </p>
-      )}
+      {isLoading && <p className="text-sm text-slate-500">{t("common:loading")}</p>}
+      {!isLoading && quizzes.length === 0 && <p className="text-sm text-slate-500">{t("empty")}</p>}
 
       {quizzes.map((q) => (
         <QuizListCard key={q.id} summary={q} onEdit={onEdit} />

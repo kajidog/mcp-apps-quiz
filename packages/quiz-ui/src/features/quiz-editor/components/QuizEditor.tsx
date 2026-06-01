@@ -1,6 +1,7 @@
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/index.js";
 import type { Quiz } from "@quiz/core";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSaveQuiz } from "../hooks/useSaveQuiz.js";
 import {
   type ChoiceDraft,
@@ -25,6 +26,7 @@ const inputClass = "w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
 
 /** クイズの新規作成・編集フォーム。設問・選択肢を動的に増減できる。 */
 export function QuizEditor({ quiz, onSaved, onCancel }: Props) {
+  const { t } = useTranslation("editor");
   const editing = !!quiz;
   const save = useSaveQuiz();
   const [title, setTitle] = useState(quiz?.title ?? "");
@@ -69,7 +71,13 @@ export function QuizEditor({ quiz, onSaved, onCancel }: Props) {
     const cleanTags = parseTags(tags);
     const builtQuestions = buildQuestions(questions);
 
-    const validationError = validateBuiltQuiz(cleanTitle, builtQuestions);
+    const validationError = validateBuiltQuiz(cleanTitle, builtQuestions, {
+      titleRequired: () => t("errors.titleRequired"),
+      questionsRequired: () => t("errors.questionsRequired"),
+      questionTextRequired: (number) => t("errors.questionTextRequired", { number }),
+      choicesRequired: (number) => t("errors.choicesRequired", { number }),
+      correctChoiceRequired: (number) => t("errors.correctChoiceRequired", { number }),
+    });
     if (validationError) {
       setError(validationError);
       return;
@@ -83,7 +91,7 @@ export function QuizEditor({ quiz, onSaved, onCancel }: Props) {
         questions: builtQuestions,
       });
       if (!result) {
-        setError("保存に失敗しました。");
+        setError(t("errors.saveFailed"));
         return;
       }
       onSaved(result);
@@ -95,31 +103,31 @@ export function QuizEditor({ quiz, onSaved, onCancel }: Props) {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
       <header className="flex items-center justify-between gap-2">
-        <h1 className="text-xl font-bold">{editing ? "クイズを編集" : "クイズを新規作成"}</h1>
+        <h1 className="text-xl font-bold">{editing ? t("title.edit") : t("title.create")}</h1>
         <Button variant="outline" onClick={onCancel}>
-          キャンセル
+          {t("cancel")}
         </Button>
       </header>
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium text-slate-700" htmlFor="quiz-title">
-          タイトル
+          {t("fields.title")}
         </label>
         <input
           id="quiz-title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="例: 基本情報技術者 模試"
+          placeholder={t("fields.titlePlaceholder")}
           className={inputClass}
         />
         <label className="text-sm font-medium text-slate-700" htmlFor="quiz-tags">
-          タグ（カンマ区切り）
+          {t("fields.tags")}
         </label>
         <input
           id="quiz-tags"
           value={tags}
           onChange={(e) => setTags(e.target.value)}
-          placeholder="例: IT, 資格"
+          placeholder={t("fields.tagsPlaceholder")}
           className={inputClass}
         />
       </div>
@@ -133,7 +141,7 @@ export function QuizEditor({ quiz, onSaved, onCancel }: Props) {
               <CardTitle>Q{qi + 1}</CardTitle>
               {questions.length > 1 && (
                 <Button variant="ghost" onClick={() => removeQuestion(qi)}>
-                  設問を削除
+                  {t("actions.removeQuestion")}
                 </Button>
               )}
             </div>
@@ -142,7 +150,7 @@ export function QuizEditor({ quiz, onSaved, onCancel }: Props) {
             <textarea
               value={q.text}
               onChange={(e) => updateQuestion(qi, { text: e.target.value })}
-              placeholder="問題文"
+              placeholder={t("fields.questionPlaceholder")}
               rows={2}
               className={inputClass}
             />
@@ -155,20 +163,20 @@ export function QuizEditor({ quiz, onSaved, onCancel }: Props) {
                     type="checkbox"
                     checked={c.isCorrect}
                     onChange={(e) => updateChoice(qi, ci, { isCorrect: e.target.checked })}
-                    aria-label="正解にする"
+                    aria-label={t("fields.correctChoiceAria")}
                     className="h-4 w-4"
                   />
                   <input
                     value={c.text}
                     onChange={(e) => updateChoice(qi, ci, { text: e.target.value })}
-                    placeholder={`選択肢 ${ci + 1}`}
+                    placeholder={t("fields.choicePlaceholder", { number: ci + 1 })}
                     className={inputClass}
                   />
                   {q.choices.length > 2 && (
                     <Button
                       variant="ghost"
                       onClick={() => removeChoice(qi, ci)}
-                      aria-label="選択肢を削除"
+                      aria-label={t("fields.removeChoiceAria")}
                     >
                       ✕
                     </Button>
@@ -176,14 +184,14 @@ export function QuizEditor({ quiz, onSaved, onCancel }: Props) {
                 </div>
               ))}
               <Button variant="outline" onClick={() => addChoice(qi)} className="self-start">
-                選択肢を追加
+                {t("fields.addChoice")}
               </Button>
             </div>
 
             <textarea
               value={q.explanation}
               onChange={(e) => updateQuestion(qi, { explanation: e.target.value })}
-              placeholder="解説（任意）"
+              placeholder={t("fields.explanationPlaceholder")}
               rows={2}
               className={inputClass}
             />
@@ -192,13 +200,13 @@ export function QuizEditor({ quiz, onSaved, onCancel }: Props) {
       ))}
 
       <Button variant="secondary" onClick={addQuestion}>
-        設問を追加
+        {t("actions.addQuestion")}
       </Button>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <Button onClick={() => void onSave()} disabled={save.isPending} className="self-end">
-        {save.isPending ? "保存中…" : editing ? "更新する" : "作成する"}
+        {save.isPending ? t("actions.saving") : editing ? t("actions.update") : t("actions.create")}
       </Button>
     </div>
   );
