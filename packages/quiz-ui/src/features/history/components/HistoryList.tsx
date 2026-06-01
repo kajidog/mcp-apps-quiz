@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/shared/ui/index.js";
 import type { AttemptSummary } from "@quiz/core";
+import { useTranslation } from "react-i18next";
 import { useRecentAttempts } from "../hooks/useRecentAttempts.js";
 
 interface Props {
@@ -10,11 +11,12 @@ interface Props {
 
 /** 直近の受験履歴一覧。 */
 export function HistoryList({ initial, onOpen }: Props) {
+  const { i18n, t } = useTranslation(["history", "common"]);
   const { data: attempts = [], isLoading } = useRecentAttempts(20, initial);
 
-  if (isLoading) return <p className="p-4 text-sm text-slate-500">読み込み中…</p>;
+  if (isLoading) return <p className="p-4 text-sm text-slate-500">{t("common:loading")}</p>;
   if (attempts.length === 0)
-    return <p className="p-4 text-sm text-slate-500">受験履歴はまだありません。</p>;
+    return <p className="p-4 text-sm text-slate-500">{t("empty")}</p>;
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-2 p-4">
@@ -28,7 +30,7 @@ export function HistoryList({ initial, onOpen }: Props) {
             <div className="flex flex-col">
               <span className="font-medium">{a.quizTitle}</span>
               <span className="text-xs text-slate-500">
-                {new Date(a.finishedAt).toLocaleString()}
+                {new Date(a.finishedAt).toLocaleString(i18n.resolvedLanguage)}
               </span>
             </div>
             <span className="text-sm font-semibold">

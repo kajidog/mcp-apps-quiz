@@ -1,12 +1,14 @@
 import { cn } from "@/shared/lib/utils.js";
 import type { Quiz } from "@quiz/core";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * 確認用のクイズ閲覧。設問の選択肢をクリックすると、その設問だけ
  * 正解と解説が開く（採点・履歴保存はしない）。
  */
 export function QuizReview({ quiz }: { quiz: Quiz }) {
+  const { t } = useTranslation("library");
   // 設問 ID → クリックした選択肢 ID（クリックで解説を開く）
   const [picked, setPicked] = useState<Record<string, string>>({});
 
@@ -38,13 +40,15 @@ export function QuizReview({ quiz }: { quiz: Quiz }) {
                   )}
                 >
                   <span>{c.text}</span>
-                  {showCorrect && <span className="ml-auto text-green-600">✓ 正解</span>}
+                  {showCorrect && (
+                    <span className="ml-auto text-green-600">{t("review.correct")}</span>
+                  )}
                 </button>
               );
             })}
             {revealed && q.explanation && (
               <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                解説: {q.explanation}
+                {t("review.explanation")} {q.explanation}
               </p>
             )}
           </div>

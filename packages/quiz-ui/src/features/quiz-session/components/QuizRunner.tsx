@@ -3,6 +3,7 @@ import { QuizPlay } from "@/shared/components/QuizPlay.js";
 import { Badge, Button, Card, CardContent } from "@/shared/ui/index.js";
 import type { Attempt, Quiz } from "@quiz/core";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSubmitAttempt } from "../hooks/useSubmitAttempt.js";
 import { type Selections, buildResultMap, toAnswers, toggleChoice } from "../lib/grading.js";
 
@@ -14,6 +15,7 @@ interface Props {
 
 /** 単一クイズの出題・回答・採点結果表示を担うメイン画面。 */
 export function QuizRunner({ quiz: initialQuiz, onBack, onEdit }: Props) {
+  const { t } = useTranslation(["session", "common"]);
   const submit = useSubmitAttempt();
   const favorite = useToggleFavorite();
   const [quiz, setQuiz] = useState(initialQuiz);
@@ -55,17 +57,21 @@ export function QuizRunner({ quiz: initialQuiz, onBack, onEdit }: Props) {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="ghost" onClick={() => void onToggleFavorite()} aria-label="favorite">
+          <Button
+            variant="ghost"
+            onClick={() => void onToggleFavorite()}
+            aria-label={t("runner.favoriteAria")}
+          >
             {quiz.favorite ? "★" : "☆"}
           </Button>
           {onEdit && (
             <Button variant="outline" onClick={onEdit}>
-              編集
+              {t("common:edit")}
             </Button>
           )}
           {onBack && (
             <Button variant="outline" onClick={onBack}>
-              一覧へ
+              {t("runner.backToList")}
             </Button>
           )}
         </div>
@@ -75,9 +81,9 @@ export function QuizRunner({ quiz: initialQuiz, onBack, onEdit }: Props) {
         <Card className="border-slate-300 bg-slate-50">
           <CardContent className="flex items-center justify-between pt-5">
             <span className="text-lg font-semibold">
-              スコア: {attempt.score} / {attempt.total}
+              {t("runner.score", { score: attempt.score, total: attempt.total })}
             </span>
-            <Button onClick={reset}>もう一度</Button>
+            <Button onClick={reset}>{t("runner.retry")}</Button>
           </CardContent>
         </Card>
       )}
@@ -91,7 +97,7 @@ export function QuizRunner({ quiz: initialQuiz, onBack, onEdit }: Props) {
 
       {!attempt && (
         <Button onClick={() => void onSubmit()} disabled={submit.isPending} className="self-end">
-          {submit.isPending ? "採点中…" : "採点する"}
+          {submit.isPending ? t("runner.grading") : t("runner.grade")}
         </Button>
       )}
     </div>

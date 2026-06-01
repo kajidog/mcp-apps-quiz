@@ -1,4 +1,5 @@
 import type { Question, QuestionResult } from "@quiz/core";
+import { useTranslation } from "react-i18next";
 import { cn } from "../lib/utils.js";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/index.js";
 
@@ -24,6 +25,7 @@ export function QuizPlay({
   onToggle,
   startIndex = 0,
 }: Props) {
+  const { t } = useTranslation("common");
   const graded = !!resultByQuestion;
   return (
     <>
@@ -41,7 +43,7 @@ export function QuizPlay({
                       result.isCorrect ? "text-green-600" : "text-red-600",
                     )}
                   >
-                    {result.isCorrect ? "正解" : "不正解"}
+                    {result.isCorrect ? t("quizPlay.correct") : t("quizPlay.incorrect")}
                   </span>
                 )}
               </CardTitle>
@@ -73,7 +75,7 @@ export function QuizPlay({
               })}
               {result && q.explanation && (
                 <p className="mt-1 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                  解説: {q.explanation}
+                  {t("quizPlay.explanation")} {q.explanation}
                 </p>
               )}
             </CardContent>
