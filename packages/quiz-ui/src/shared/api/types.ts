@@ -16,4 +16,5 @@ export type ToolPayload =
   | { kind: "history"; attempts: AttemptSummary[] }
   | { kind: "attempt"; attempt: Attempt }
   | { kind: "attemptDetail"; detail: AttemptDetail }
+  | { kind: "deleted"; quizId: string }
   | { kind: "error"; message: string };

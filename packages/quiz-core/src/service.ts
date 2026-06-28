@@ -73,6 +73,11 @@ export class QuizService {
     return this.repo.setFavorite(id, !quiz.favorite);
   }
 
+  /** クイズを 1 件削除する。削除できたら true、存在しなければ false */
+  deleteQuiz(id: string): boolean {
+    return this.repo.deleteQuiz(id);
+  }
+
   /** 回答を採点し、履歴として保存して結果を返す */
   recordAttempt(input: unknown): Attempt {
     const parsed = submitAttemptInputSchema.parse(input);

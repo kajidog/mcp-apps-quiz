@@ -32,6 +32,7 @@ export function createResolvers(service: QuizService) {
         service.editQuiz({ quizId: args.quizId, patch: args.patch as never }),
       toggleFavorite: (_: unknown, { quizId }: { quizId: string }) =>
         service.toggleFavorite(quizId),
+      deleteQuiz: (_: unknown, { quizId }: { quizId: string }) => service.deleteQuiz(quizId),
       submitAttempt: (
         _: unknown,
         args: { quizId: string; answers: unknown; startedAt?: string | null },

@@ -14,6 +14,8 @@ export interface LibraryApi {
   searchQuizzes(args: SearchArgs): Promise<QuizSummary[]>;
   getQuiz(id: string): Promise<Quiz | null>;
   toggleFavorite(quizId: string): Promise<Quiz | null>;
+  /** クイズを削除する。削除できたら true。 */
+  deleteQuiz(quizId: string): Promise<boolean>;
 }
 
 const SearchQuizzesDoc = graphql(`
@@ -29,6 +31,9 @@ const GetQuizDoc = graphql(`
 const ToggleFavoriteDoc = graphql(`
   mutation ToggleFavorite($quizId: ID!) { toggleFavorite(quizId: $quizId) { ...QuizFields } }
 `);
+const DeleteQuizDoc = graphql(`
+  mutation DeleteQuiz($quizId: ID!) { deleteQuiz(quizId: $quizId) }
+`);
 
 export function createMcpLibraryApi(caller: McpCaller): LibraryApi {
   return {
@@ -38,6 +43,10 @@ export function createMcpLibraryApi(caller: McpCaller): LibraryApi {
     },
     getQuiz: (id) => caller.field<Quiz>("_get_quiz", { quizId: id }, "quiz"),
     toggleFavorite: (quizId) => caller.field<Quiz>("_toggle_favorite", { quizId }, "quiz"),
+    async deleteQuiz(quizId) {
+      const r = await caller.call("_delete_quiz", { quizId });
+      return !r.isError;
+    },
   };
 }
 
@@ -58,6 +67,10 @@ export function createGraphqlLibraryApi(execute: GraphqlExecutor): LibraryApi {
     async toggleFavorite(quizId) {
       const d = await execute(ToggleFavoriteDoc, { quizId });
       return (d.toggleFavorite ?? null) as Quiz | null;
+    },
+    async deleteQuiz(quizId) {
+      const d = await execute(DeleteQuizDoc, { quizId });
+      return Boolean(d.deleteQuiz);
     },
   };
 }

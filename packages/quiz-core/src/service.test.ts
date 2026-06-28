@@ -49,6 +49,17 @@ describe("QuizService", () => {
     expect(fetched?.questions[0]?.choices).toHaveLength(3);
   });
 
+  it("削除すると取得できなくなり、存在しない ID は false", () => {
+    const created = svc.createQuiz(sampleQuiz);
+    expect(svc.deleteQuiz(created.id)).toBe(true);
+    expect(svc.getQuiz(created.id)).toBeNull();
+    // 一覧からも消える
+    expect(svc.searchQuizzes({}).some((q) => q.id === created.id)).toBe(false);
+    // 二重削除・存在しない ID は false
+    expect(svc.deleteQuiz(created.id)).toBe(false);
+    expect(svc.deleteQuiz("does-not-exist")).toBe(false);
+  });
+
   it("不正な入力を弾く（正解なし）", () => {
     expect(() =>
       svc.createQuiz({

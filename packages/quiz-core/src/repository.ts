@@ -14,6 +14,8 @@ export interface QuizRepository {
   getQuiz(id: string): Quiz | null;
   editQuiz(input: EditQuizInput): Quiz | null;
   setFavorite(id: string, favorite: boolean): Quiz | null;
+  /** クイズを 1 件削除する。子（設問・選択肢・タグ紐付け・受験履歴）は FK の cascade で消える */
+  deleteQuiz(id: string): boolean;
   searchQuizzes(input: SearchQuizzesInput): QuizSummary[];
   /** タグのいずれかにマッチするクイズの ID 一覧 */
   findQuizIdsByTags(tags: string[]): string[];
@@ -90,6 +92,12 @@ export class DrizzleQuizRepository implements QuizRepository {
       .run();
     if (res.changes === 0) return null;
     return this.getQuiz(id);
+  }
+
+  deleteQuiz(id: string): boolean {
+    // foreign_keys=ON のため、設問・選択肢・タグ紐付け・受験履歴は cascade で削除される。
+    const res = this.db.delete(t.quizzes).where(eq(t.quizzes.id, id)).run();
+    return res.changes > 0;
   }
 
   searchQuizzes(input: SearchQuizzesInput): QuizSummary[] {

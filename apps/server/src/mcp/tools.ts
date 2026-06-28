@@ -18,6 +18,7 @@ type QuizPayload =
   | { kind: "history"; attempts: unknown }
   | { kind: "attempt"; attempt: unknown }
   | { kind: "attemptDetail"; detail: unknown }
+  | { kind: "deleted"; quizId: string }
   | { kind: "error"; message: string };
 
 function ok(text: string, payload: QuizPayload): CallToolResult {
@@ -259,6 +260,16 @@ export function registerAppOnlyTools(server: McpServer, service: QuizService): v
     async ({ quizId }): Promise<CallToolResult> => {
       const quiz = service.toggleFavorite(quizId);
       return quiz ? ok("ok", { kind: "quiz", quiz }) : fail("not found");
+    },
+  );
+
+  registerAppTool(
+    server,
+    "_delete_quiz",
+    { description: "クイズを削除", inputSchema: { quizId: z.string() }, _meta: appOnly },
+    async ({ quizId }): Promise<CallToolResult> => {
+      const deleted = service.deleteQuiz(quizId);
+      return deleted ? ok("ok", { kind: "deleted", quizId }) : fail("not found");
     },
   );
 
