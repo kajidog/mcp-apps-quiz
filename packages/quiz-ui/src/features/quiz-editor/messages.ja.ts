@@ -24,6 +24,15 @@ export const ja = {
     update: "更新する",
     create: "作成する",
   },
+  reorder: {
+    sectionTitle: "設問の並び替え（実装比較）",
+    sectionHint:
+      "ハンドルをドラッグして設問を並び替えできます。左右どちらでも同じ設問を編集します。",
+    dndkitLabel: "ライブラリ版 (dnd-kit)",
+    nativeLabel: "ライブラリなし版",
+    dragHandleAria: "ドラッグして設問を並び替え",
+    choiceHandleAria: "ドラッグして選択肢を並び替え",
+  },
   errors: {
     saveFailed: "保存に失敗しました。",
     titleRequired: "タイトルを入力してください。",

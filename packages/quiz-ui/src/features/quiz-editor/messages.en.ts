@@ -26,6 +26,14 @@ export const en = {
     update: "Update",
     create: "Create",
   },
+  reorder: {
+    sectionTitle: "Reorder questions (implementation comparison)",
+    sectionHint: "Drag the handle to reorder questions. Both sides edit the same questions.",
+    dndkitLabel: "Library version (dnd-kit)",
+    nativeLabel: "No-library version",
+    dragHandleAria: "Drag to reorder question",
+    choiceHandleAria: "Drag to reorder choice",
+  },
   errors: {
     saveFailed: "Failed to save.",
     titleRequired: "Enter a title.",
