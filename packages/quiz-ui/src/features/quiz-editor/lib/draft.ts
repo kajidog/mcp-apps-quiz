@@ -1,28 +1,38 @@
 import type { CreateQuizInput, Quiz } from "@quiz/core";
 
 export interface ChoiceDraft {
+  /** 並び替え時の安定 key 用クライアント ID（保存ペイロードには含めない）。 */
+  id?: string;
   text: string;
   isCorrect: boolean;
 }
 export interface QuestionDraft {
+  /** 並び替え時の安定 key 用クライアント ID（保存ペイロードには含めない）。 */
+  id?: string;
   text: string;
   explanation: string;
   choices: ChoiceDraft[];
 }
 
+/** クライアント側の一時 ID を生成（並び替えの React key に使う）。 */
+function draftId(): string {
+  return crypto.randomUUID();
+}
+
 export function emptyChoice(): ChoiceDraft {
-  return { text: "", isCorrect: false };
+  return { id: draftId(), text: "", isCorrect: false };
 }
 export function emptyQuestion(): QuestionDraft {
-  return { text: "", explanation: "", choices: [emptyChoice(), emptyChoice()] };
+  return { id: draftId(), text: "", explanation: "", choices: [emptyChoice(), emptyChoice()] };
 }
 
 /** 既存クイズを編集用ドラフトに変換 */
 export function toDraft(quiz: Quiz): QuestionDraft[] {
   return quiz.questions.map((q) => ({
+    id: q.id,
     text: q.text,
     explanation: q.explanation ?? "",
-    choices: q.choices.map((c) => ({ text: c.text, isCorrect: c.isCorrect })),
+    choices: q.choices.map((c) => ({ id: c.id, text: c.text, isCorrect: c.isCorrect })),
   }));
 }
 
